@@ -1,11 +1,24 @@
-﻿# Cloud Native LLM Inference Platform
+# Cloud Native LLM Inference Platform
 
-A Kubernetes-based LLM inference platform demo with an OpenAI-compatible Gateway, API key authentication, per-key rate limiting, Prometheus metrics, Grafana dashboards, and k6 benchmark reports.
+A production-style cloud native LLM inference platform demo. It shows how to put an OpenAI-compatible gateway in front of vLLM, then add API-key authentication, per-key rate limiting, Prometheus metrics, Grafana dashboards, Kubernetes deployment manifests, and k6 benchmark validation.
+
+This project is designed as an AI infrastructure / platform engineering portfolio project, not just a simple API wrapper.
 
 The project supports two backend modes:
 
-- Mock mode: Gateway forwards to an OpenAI-compatible mock vLLM service inside Kubernetes.
+- Mock mode: Gateway forwards to an OpenAI-compatible mock vLLM service for CPU-only local and Kubernetes testing.
 - Real mode: Gateway forwards to real vLLM serving `facebook/opt-125m`. On this local kind setup, real vLLM runs in Docker on the host because the kind node does not expose `nvidia.com/gpu`.
+
+## What This Demonstrates
+
+- Gateway design for LLM inference traffic
+- OpenAI-compatible API surface
+- API-key authentication and per-key request limits
+- Upstream model serving through mock vLLM or real vLLM
+- Kubernetes deployment patterns for local demos and GPU-capable clusters
+- Prometheus/Grafana observability
+- k6 benchmark workflow and documented latency results
+- Automated tests and GitHub Actions CI
 
 ## Features
 
@@ -56,6 +69,34 @@ docs/          Architecture, runbook, and benchmark report
 scripts/       PowerShell scripts for local and Kubernetes workflows
 ```
 
+## Fast Local Smoke Test
+
+Use this path when you want to verify the gateway behavior without Docker, Kubernetes, or a GPU.
+
+```powershell
+cd C:\Users\HP\llm-inference-platform
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r gateway\requirements.txt -r requirements-dev.txt
+$env:PYTHONPATH="gateway"
+pytest -q
+```
+
+Run the gateway locally:
+
+```powershell
+$env:PYTHONPATH="gateway"
+uvicorn app.main:app --host 127.0.0.1 --port 8080
+```
+
+In another PowerShell window:
+
+```powershell
+Invoke-RestMethod -Method Get -Uri "http://127.0.0.1:8080/healthz"
+Invoke-WebRequest -Uri "http://127.0.0.1:8080/metrics" -UseBasicParsing
+```
+
+For real chat-completion forwarding, start mock vLLM or real vLLM first, then call `POST /v1/chat/completions` with `Authorization: Bearer sk-demo`.
 ## Quick Demo
 
 Prerequisites:
