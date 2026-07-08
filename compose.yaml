@@ -1,0 +1,20 @@
+services:
+  mock-vllm:
+    build:
+      context: ./mock-vllm
+    image: llm-platform-mock-vllm:0.1.0
+    ports:
+      - "8000:8000"
+
+  gateway:
+    build:
+      context: ./gateway
+    image: llm-platform-gateway:0.1.0
+    depends_on:
+      - mock-vllm
+    environment:
+      API_KEYS: sk-demo
+      VLLM_BASE_URL: http://mock-vllm:8000
+      RATE_LIMIT_PER_MINUTE: "60"
+    ports:
+      - "8080:8080"

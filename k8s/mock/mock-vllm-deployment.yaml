@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mock-vllm
+  namespace: llm-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      containers:
+        - name: mock-vllm
+          image: llm-platform-mock-vllm:0.1.0
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+              name: http
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 20

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vllm
+  namespace: llm-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vllm
+  template:
+    metadata:
+      labels:
+        app: vllm
+    spec:
+      containers:
+        - name: vllm
+          image: vllm/vllm-openai:latest
+          imagePullPolicy: IfNotPresent
+          args:
+            - facebook/opt-125m
+            - --host
+            - 0.0.0.0
+            - --port
+            - "8000"
+            - --max-model-len
+            - "1024"
+            - --gpu-memory-utilization
+            - "0.75"
+            - --chat-template
+            - /etc/vllm/opt-chat-template.jinja
+          ports:
+            - containerPort: 8000
+              name: http
+          volumeMounts:
+            - name: vllm-config
+              mountPath: /etc/vllm
+              readOnly: true
+          resources:
+            requests:
+              cpu: "2"
+              memory: "4Gi"
+            limits:
+              cpu: "6"
+              memory: "7Gi"
+              nvidia.com/gpu: "1"
+      volumes:
+        - name: vllm-config
+          configMap:
+            name: vllm-config

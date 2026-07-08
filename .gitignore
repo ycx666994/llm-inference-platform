@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+benchmark/results/
+.k6/
+*.log
+logs/

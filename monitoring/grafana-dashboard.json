@@ -1,0 +1,68 @@
+{
+  "title": "LLM Gateway Overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "10s",
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Gateway QPS",
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_requests_total[1m]))"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "P95 Latency",
+      "targets": [
+        {
+          "expr": "histogram_quantile(0.95, sum(rate(gateway_request_latency_seconds_bucket[5m])) by (le))"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "HTTP Errors",
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_requests_total{status_code=~\"4..|5..\"}[1m])) by (status_code)"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      }
+    },
+    {
+      "type": "timeseries",
+      "title": "Upstream Status by Model",
+      "targets": [
+        {
+          "expr": "sum(rate(gateway_upstream_requests_total[1m])) by (model, status_code)"
+        }
+      ],
+      "gridPos": {
+        "x": 12,
+        "y": 8,
+        "w": 12,
+        "h": 8
+      }
+    }
+  ]
+}
