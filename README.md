@@ -1,4 +1,4 @@
-# Cloud Native LLM Inference Platform
+﻿# Cloud Native LLM Inference Platform
 
 A Kubernetes-based LLM inference platform demo with an OpenAI-compatible Gateway, API key authentication, per-key rate limiting, Prometheus metrics, Grafana dashboards, and k6 benchmark reports.
 
